@@ -1,0 +1,27 @@
+﻿I'm sorry, but an uncaught exception occurred.
+
+While running game code:
+FileNotFoundError: [Errno 2] No such file or directory: '/home/suyog/.renpy/Elyssia in the Mukundaland-1704990877/persistent'
+
+-- Full Traceback ------------------------------------------------------------
+
+Full traceback:
+  File "/home/suyog/gamesnshit/renpy-8.1.3-sdk/renpy/bootstrap.py", line 275, in bootstrap
+    renpy.main.main()
+  File "/home/suyog/gamesnshit/renpy-8.1.3-sdk/renpy/main.py", line 684, in main
+    renpy.persistent.update(True)
+  File "/home/suyog/gamesnshit/renpy-8.1.3-sdk/renpy/persistent.py", line 401, in update
+    save()
+  File "/home/suyog/gamesnshit/renpy-8.1.3-sdk/renpy/persistent.py", line 419, in save
+    renpy.loadsave.location.save_persistent(compressed)
+  File "/home/suyog/gamesnshit/renpy-8.1.3-sdk/renpy/savelocation.py", line 545, in save_persistent
+    l.save_persistent(data)
+  File "/home/suyog/gamesnshit/renpy-8.1.3-sdk/renpy/savelocation.py", line 381, in save_persistent
+    self.persistent_mtime = os.path.getmtime(fn)
+  File "/home/tom/ab/renpy-build-fix/tmp/install.linux-x86_64/lib/python3.9/genericpath.py", line 55, in getmtime
+FileNotFoundError: [Errno 2] No such file or directory: '/home/suyog/.renpy/Elyssia in the Mukundaland-1704990877/persistent'
+
+Linux-6.5.0-14-generic-x86_64-with-glibc2.35 x86_64
+Ren'Py 8.1.3.23091805
+Elyssia in the Mukundaland 1.0
+Sat Jan 13 17:58:55 2024

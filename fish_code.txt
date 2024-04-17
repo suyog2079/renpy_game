@@ -1,0 +1,96 @@
+    label fish_game_init:
+        e "let's play this game"
+
+    init 15:
+        $ Fish = 1  # Responsible for the correct functioning of the mini-game.
+        $ Broken = 0  # Indicates whether the fish will break free.
+        $ BrokenFish = 0  # Also indicates whether the fish will break free.
+        $ Random_Time = 1
+
+    init -5 python:
+        style.FishingBar = Style(style.default)
+        style.FishingBar.left_bar = Frame("MiniGameFishing/BarFull.png", 0, 0)
+        style.FishingBar.right_bar = Frame("MiniGameFishing/BarEmpty.png", 0, 0)
+        style.FishingBar.thumb = "MiniGameFishing/thumb.png"
+        style.FishingBar.thumb_offset = 26
+        style.FishingBar.left_gutter = 35
+        style.FishingBar.xmaximum = 364  # bar width
+        style.FishingBar.ymaximum = 50  # bar height
+
+    screen MiniGameFish:
+        add "MiniGameFishing/Bg.jpg"
+
+        if BrokenFish == 0:
+            add "MiniGameFishing/status1.jpg" align(0.5, 0.6)  # Images added based on the value of BrokenFish
+        if BrokenFish == 1:  # Observing the tension of the fishing line with these images
+            add "MiniGameFishing/status2.jpg" align(0.5, 0.6)
+        if BrokenFish == 2:
+            add "MiniGameFishing/status3.jpg" align(0.5, 0.6)
+        if BrokenFish == 3:
+            add "MiniGameFishing/status4.jpg" align(0.5, 0.6)
+        if BrokenFish == 4:
+            add "MiniGameFishing/status5.jpg" align(0.5, 0.6)
+
+        if FishUp <= 0:  # Button condition for catching fish.
+            key "K_SPACE" action [Jump("YouWin"), Hide('Fish_Up'), Hide('Fish_Free'), Hide('MiniGameFish')]
+        else:
+            if BrokenFish <= 3:
+                if Broken == 1:
+                    key "K_SPACE" action [SetVariable("FishUp", FishUp - 1), SetVariable("BrokenFish", BrokenFish + 1)]
+                if Broken == 0:
+                    key "K_SPACE" action SetVariable("FishUp", FishUp - 1)
+            if BrokenFish == 4:
+                key "K_SPACE" action [Jump("BrokenFish_End"), Hide('Fish_Up'), Hide('Fish_Free'), Hide('MiniGameFish')]
+
+        bar:
+            style "FishingBar"
+            range 150
+            value FishUp
+            align(0.5, 0.7)
+
+    screen Fish_Up:
+        timer 0.01 action SetVariable("Random_Time", renpy.random.randint(1, 6))  # Responsible for the pause during which the fish can be pulled calmly
+        if BrokenFish >= 1:
+            timer 0.7 repeat True action SetVariable("BrokenFish", BrokenFish - 1)  # Indicates that the fishing line will lose its tension, and the time to reset tension can be changed
+        if BrokenFish == 0:
+            timer 0.05 repeat True action NullAction()
+        if FishUp <= 149:
+            timer Random_Time repeat True action SetVariable("Fish", renpy.random.randint(1, 5)), Hide("Fish_Up"), Show("Fish_Free")  # Here, a random value for the Fish variable is set
+        if FishUp >= 150:  # Essentially sets the resistance time of the fish
+            timer 0.01 action [Jump("YouLose"), Hide('Fish_Up'), Hide('Fish_Free')]
+
+    screen Fish_Free:
+        if FishUp <= 149:
+            if Fish == 1:
+                if FishUp <= 149:
+                    timer 0.03 repeat True action SetVariable("FishUp", FishUp + 1), SetVariable("Fish", Fish + 1), SetVariable("Broken", 1)
+                if FishUp >= 150:
+                    timer 0.01 action [Jump("YouLose"), Hide('Fish_Up'), Hide('Fish_Free')]
+            # (Repeat the above block for Fish values 2 to 15, adjusting the conditions as needed)
+            if Fish == 15:
+                if FishUp <= 149:
+                    # Leave this timer last.
+                    # If you want to change the fish resistance time, copy one of the conditions above and paste it above this line
+                    # Also, remember to change the Fish value; the higher the resistance time, the more conditions with Fish
+                    timer 0.03 repeat True action SetVariable("FishUp", FishUp + 1), SetVariable("Fish", Fish + 1), SetVariable("Broken", 0), Hide('Fish_Free'), Show('Fish_Up'), If(FishUp >= 150, [Jump("YouLose"), Hide('Fish_Up'), Hide('Fish_Free')])
+                if FishUp >= 150:
+                    timer 0.01 action [Jump("YouLose"), Hide('Fish_Up'), Hide('Fish_Free')]
+        if FishUp >= 150:
+            timer 0.01 action [Jump("YouLose"), Hide('Fish_Up'), Hide('Fish_Free')]
+
+    label YouLose:
+        window show
+        "You Lose"
+        window hide
+        jump fish_game_init
+
+    label YouWin:
+        $ TypeFish = renpy.random.choice(["Salmon", "Carp", "Saiga", "Hedgehog Fish"])
+        window show
+        "[TypeFish]"
+        window hide
+        $ renpy.pause(2, hard=True)
+        jump BrokenFish_End
+
+    label BrokenFish_End:
+        e "well it surely was fun!"
